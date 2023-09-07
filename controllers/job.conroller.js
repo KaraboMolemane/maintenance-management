@@ -1,11 +1,14 @@
 //find Jobs - All
 exports.findAll = function (req, res) {
-  Job.find(function (err, blogs) {
+  Job.find(function (err, jobs) {
     if (err) {
       console.log(err);
       res.status(500).send({ message: "Some error occurred while retrieving jobs" });
     } else {
-      res.send(blogs);
+      res.send(jobs);
     }
   });
 };
+
+
+//How does the app.js know about this file's existance? import/export? 

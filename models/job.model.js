@@ -27,3 +27,5 @@ let JobSchema = mongoose.Schema({
   
   // Create Model
   let Job = mongoose.model("Job", JobSchema);
+
+  //How does the app.js know about this file's existance? import/export? 
