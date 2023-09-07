@@ -16,9 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // Connect to database
-const uri =
-  "mongodb+srv://karabopro10:10KArabo@cluster-hyperiondev.0kansgb.mongodb.net/";
-mongoose.connect(uri, {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -77,6 +75,7 @@ app.get("/get-all-jobs", async (req, res) => {
     }
   } catch (error) {
     throw error;
+
   }
 });
 
@@ -89,3 +88,8 @@ app.get("*", function (req, res, next) {
   err.statusCode = 404;
   next(err);
 });
+
+/*
+LINKS
+https://medium.com/featurepreneur/connect-mongodb-database-to-express-server-step-by-step-53e548bb4967
+*/
