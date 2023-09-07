@@ -7,17 +7,22 @@ import DataGrid, {
   Paging,
   Lookup,
   Form,
-  HeaderFilter, Search
+  HeaderFilter, 
+  Search,
 } from 'devextreme-react/data-grid';
 import 'devextreme-react/text-area';
 import { Item } from 'devextreme-react/form';
 import { employees, states } from './data.js';
+import Header from "./components/Header";
 
 const notesEditorOptions = { height: 100 };
 
 function App() {
   return (
-      <div id="data-grid-demo">
+    <>
+    <Header  />
+    <h4>Jobs:</h4>
+    <div id="data-grid-demo">
         <DataGrid
           dataSource={employees}
           keyExpr="ID"
@@ -67,7 +72,20 @@ function App() {
           <Column dataField="Notes" visible={false} />
         </DataGrid>
       </div>
+    </>
+      
     );
 }
 
 export default App;
+
+/*
+LINKS
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/Localization/UsingGlobalize/React/Light/
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/DataGrid/RowEditingAndEditingEvents/jQuery/Light/
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/DataGrid/CellEditingAndEditingAPI/jQuery/Light/
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/DataGrid/FormEditing/jQuery/Light/
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/DataGrid/WebAPIService/React/Light/ - has filter 
+https://js.devexpress.com/Demos/WidgetsGallery/Demo/DataGrid/EditStateManagement/React/Light/ - write to DB example 
+
+*/
