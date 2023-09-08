@@ -82,10 +82,41 @@ app.get("/get-all-jobs", async (req, res) => {
 //get jobs - all (via Model and Controller)
 // app.get("/get-all-jobs", findAll);
 
-// The user should be able to use Postman to make an HTTP Post request that adds an additional item to the list of cars.
-app.post('/new-job', function(req, res) {
-    // Create and save a new jon
-    let jobModel = new JobModel({
+// Add new job
+app.post("/new-job", function (req, res) {
+  // Create and save a new jon
+  let jobModel = new JobModel({
+    description: req.body.description,
+    location: req.body.location,
+    priority: req.body.priority,
+    status: req.body.status,
+    archived: false,
+    createdAt: req.body.createdAt,
+    updatedAt: req.body.updatedAt,
+  });
+
+  jobModel
+    .save()
+    .then(function (doc) {
+      console.log(doc._id.toString());
+      res.send("The job has been added");
+    })
+    .catch(function (error) {
+      console.log(error);
+      res
+        .status(500)
+        .send({ message: "Some error occurred while creating the job." });
+    });
+  // https://codeforgeek.com/insert-a-document-into-mongodb-using-mongoose/
+});
+
+// Edit existing job
+app.post("/edit-job", function (req, res) {
+
+    let filter = { _id: req.body.id };
+  JobModel.findOneAndUpdate(
+    filter,
+    {    
         description: req.body.description,
         location: req.body.location,
         priority: req.body.priority,
@@ -93,18 +124,15 @@ app.post('/new-job', function(req, res) {
         archived: false,
         createdAt: req.body.createdAt,
         updatedAt: req.body.updatedAt
-    });
-
-    console.log('jobModel', jobModel)
-
-    jobModel.save().then(function (doc) {
-        console.log(doc._id.toString());
-        res.send('The job has been added');
-    }).catch(function (error) {
-        console.log(error);
-        res.status(500).send({message: "Some error occurred while creating the job."});
-    });
-    // https://codeforgeek.com/insert-a-document-into-mongodb-using-mongoose/
+     },
+    { new: true },
+    function (err, doc) {
+      if (err) {
+        console.log("Something went wrong when updating data.");
+      }
+      res.send("Updated");
+    }
+  );
 });
 
 app.listen(8080, function () {

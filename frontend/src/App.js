@@ -23,20 +23,35 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
-  const editingMode = useRef(false);
+  const editingModeId = useRef(0);
 
   const status = [
     {
       ID: "submitted",
-      Name: "submitted",
+      Name: "Submitted",
     },
     {
       ID: "progress",
-      Name: "progress",
+      Name: "In progress",
     },
     {
       ID: "completed",
-      Name: "completed",
+      Name: "Completed",
+    },
+  ];
+
+  const priority = [
+    {
+      ID: "Low",
+      Name: "Low",
+    },
+    {
+      ID: "Medium",
+      Name: "Medium",
+    },
+    {
+      ID: "High",
+      Name: "High",
     },
   ];
 
@@ -61,16 +76,27 @@ function App() {
   }, []);
 
   const onSaving = useCallback((e) => {
-    console.log("bare ke E", e);
-    e.cancel = true;
-    //e.promise = saveChange(dispatch, e.changes[0]);
 
-    if (editingMode.current) {
-      // Edit existing job
-      //TO-DO
+    console.log("On saving", e);
+  
+    if (editingModeId.current !== 0) {
+      // EDIT existing job
+      const job = {
+        id: editingModeId.current,
+        id2: e.changes[0].data._id,
+        description: e.changes[0].data.description,
+        location: e.changes[0].data.location,
+        priority: e.changes[0].data.priority,
+        status: e.changes[0].data.status,
+        createdAt: e.changes[0].data.createdAt,
+        updatedAt: e.changes[0].data.updatedAt,
+      };
+
+      console.log('edited car', job)
+      
       console.log('saving edited car ....');
     } else {
-      // Add new job 
+      // ADD new job 
       console.log('saving new car ....');
 
       const job = {
@@ -90,7 +116,6 @@ function App() {
         body: JSON.stringify(job),
       }).then(() => {
         console.log('React - new job added');
-        //window.location.href = "/";
       });
     }
 
@@ -98,45 +123,11 @@ function App() {
     //Route to homepage to refresh table
   }, []);
 
-  const onSaving2 = (e) => {
-    console.log("on saving", e);
-    e.cancel = true;
-    //e.promise = saveChange(dispatch, e.changes[0]);
-
-    
-    //Reset editingMode,
-    //Route to homepage to refresh table
-    
-  };
 
   const afterSaving = (e) => {
     console.log("After saving", e);
     e.cancel = true;
     //e.promise = saveChange(dispatch, e.changes[0]);
-
-    if (editingMode) {
-      // Edit existing job
-      //TO-DO
-    } else {
-      // Add new job 
-      const job = {
-        description: e.changes[0].data.description,
-        location: e.changes[0].data.location,
-        priority: e.changes[0].data.priority,
-        status: e.changes[0].data.status,
-        createdAt: e.changes[0].data.createdAt,
-        updatedAt: e.changes[0].data.updatedAt,
-      };
-
-      fetch("/new-job", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(job),
-      }).then(() => {
-        console.log('React - new job added');
-        window.location.href = "/";
-      });
-    }
     //Reset editingMode,
     //Route to homepage to refresh table
   };
@@ -149,7 +140,9 @@ function App() {
 
   const editJob = useCallback((e) => {
     console.log("editJob", e);
-    e.cancel = true;
+    //get id of job being edited 
+    editingModeId.current = e.key;
+    // e.cancel = true;
     //e.promise = saveChange(dispatch, e.changes[0]);
   }, []);
 
@@ -190,12 +183,14 @@ function App() {
             </Form>
           </Editing>
           <Column dataField="_id" caption="Id" width={70} />
-          <Column dataField="description" />
+          <Column dataField="description" width={170} />
           <Column dataField="location" />
-          <Column dataField="status" caption="Status" width={125}>
+          <Column dataField="status" caption="Status" >
             <Lookup dataSource={status} displayExpr="Name" valueExpr="ID" />
           </Column>
-          <Column dataField="priority" width={170} />
+          <Column dataField="priority" caption="Priority" >
+            <Lookup dataSource={priority} displayExpr="Name" valueExpr="ID" />
+          </Column>
           <Column dataField="createdAt" dataType="date" />
           <Column dataField="updatedAt" dataType="date" />
         </DataGrid>
