@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import "./App.css";
 import "devextreme/dist/css/dx.light.css";
 import DataGrid, {
@@ -18,14 +19,54 @@ import Header from "./components/Header";
 const notesEditorOptions = { height: 100 };
 
 function App() {
+    //declare state(s)
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [items, setItems] = useState([]);
+
+    const status = [{
+      ID: 'submitted',
+      Name: 'submitted',
+    }, {
+      ID: 'progress',
+      Name: 'progress',
+    }, {
+      ID: 'completed',
+      Name: 'completed',
+    }];
+
+
+useEffect(() => {
+    //loadJobs(dispatch);
+    //Do the API call
+      fetch("/get-all-jobs")
+        //.then((res) => console.log('res:',res))
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            setIsLoaded(true);
+            console.log('Jobs:', result);
+            setItems(result);
+          },
+          (error) => {
+            setIsLoaded(true);
+            console.log('error:', error);
+            setError(error);
+          }
+        );
+    
+  }, []);
+
+
+
   return (
     <>
     <Header  />
     <h4>Jobs:</h4>
     <div id="data-grid-demo">
         <DataGrid
-          dataSource={employees}
-          keyExpr="ID"
+          dataSource={items}
+          keyExpr="_id"
           showBorders={true}
         >
           <Paging enabled={false} />
@@ -37,39 +78,31 @@ function App() {
             allowUpdating={true}
             allowAdding={true}
             allowDeleting={true}>
-            <Popup title="Employee Info" showTitle={true} width={700} height={525} />
+            <Popup title="Job Info" showTitle={true} width={700} height={325} />
             <Form>
               <Item itemType="group" colCount={2} colSpan={2}>
-                <Item dataField="FirstName" />
-                <Item dataField="LastName" />
-                <Item dataField="Prefix" />
-                <Item dataField="BirthDate" />
-                <Item dataField="Position" />
-                <Item dataField="HireDate" />
-                <Item
-                  dataField="Notes"
-                  editorType="dxTextArea"
-                  colSpan={2}
-                  editorOptions={notesEditorOptions} />
-              </Item>
-
-              <Item itemType="group" caption="Home Address" colCount={2} colSpan={2}>
-                <Item dataField="StateID" />
-                <Item dataField="Address" />
+                <Item dataField="description" />
+                <Item dataField="location" />
+                <Item dataField="priority" />
+                <Item dataField="status" />
+                <Item dataField="createdAt" />
+                <Item dataField="updatedAt" />
               </Item>
             </Form>
           </Editing>
-          <Column dataField="Prefix" caption="Title" width={70} />
-          <Column dataField="FirstName" />
-          <Column dataField="LastName" />
-          <Column dataField="BirthDate" dataType="date" />
-          <Column dataField="Position" width={170} />
-          <Column dataField="HireDate" dataType="date" />
-          <Column dataField="StateID" caption="State" width={125}>
-            <Lookup dataSource={states} valueExpr="ID" displayExpr="Name" />
+          <Column dataField="_id" caption="Id" width={70} />
+          <Column dataField="description" />
+          <Column dataField="location" />
+          <Column
+            dataField="status"
+            caption="Status"
+            width={125}
+          >
+            <Lookup dataSource={status} displayExpr="Name" valueExpr="ID" />
           </Column>
-          <Column dataField="Address" visible={false} />
-          <Column dataField="Notes" visible={false} />
+          <Column dataField="priority" width={170} />
+          <Column dataField="createdAt" dataType="date" />
+          <Column dataField="updatedAt" dataType="date" />
         </DataGrid>
       </div>
     </>

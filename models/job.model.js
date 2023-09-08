@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 // Create schema
 let JobSchema = mongoose.Schema({
     description: {
@@ -26,6 +28,5 @@ let JobSchema = mongoose.Schema({
   });
   
   // Create Model
-  let Job = mongoose.model("Job", JobSchema);
+  exports.Job = mongoose.model("Job", JobSchema);
 
-  //How does the app.js know about this file's existance? import/export? 

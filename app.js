@@ -5,6 +5,8 @@ const helmet = require("helmet");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+// const {findAll}  = require("./controllers/job.controller");
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -20,16 +22,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-// mongoose.Promise = global.Promise;
-// mongoose.connect(uri, {
-//   useMongoClient: true,
-// });
 mongoose.connection.on("error", function () {
   console.log("Connection to Mongo established.");
   console.log("Could not connect to the database. Exiting now...");
   process.exit();
 });
-
 mongoose.connection.once("open", function () {
   console.log("Successfully connected to the database");
 });
@@ -63,21 +60,29 @@ let JobSchema = mongoose.Schema({
 // Create Model
 let Job = mongoose.model("Job", JobSchema);
 
-//get jobs - all
 app.get("/get-all-jobs", async (req, res) => {
   try {
-    if (req.query.name) {
-    //   let allJobs = await Job.find({}).exec();
-      const allJobs = await Job.find({});
-      res.json(allJobs);
-    } else {
-      res.json({ error: "No name query found inside request" });
-    }
+    const allJobs = await Job.find({});
+    console.log("allJobs:", allJobs);
+    res.send(allJobs);
   } catch (error) {
     throw error;
-
   }
 });
+
+app.get("/get-jobs", function (req, res) {
+  Job.find(function (err, jobs) {
+    if (err) {
+      console.log(err);
+      res.status(500).send({ message: "Some error occurred while retrieving jobs" });
+    } else {
+      res.send(jobs);
+    }
+  });
+});
+
+//get jobs - all (via Model and Controller)
+// app.get("/get-all-jobs", findAll);
 
 app.listen(8080, function () {
   console.log("Example app listening on port 8080!");
