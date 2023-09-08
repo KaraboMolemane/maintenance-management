@@ -28,5 +28,5 @@ let JobSchema = mongoose.Schema({
   });
   
   // Create Model
-  exports.Job = mongoose.model("Job", JobSchema);
+  exports.JobModel = mongoose.model("Job", JobSchema);
 
