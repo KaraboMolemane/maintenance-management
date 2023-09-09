@@ -79,6 +79,17 @@ app.get("/get-all-jobs", async (req, res) => {
   }
 });
 
+app.get("/get-open-jobs", async (req, res) => {
+    // get non-archived jobs
+    try {
+      const allOpenJobs = await JobModel.find({archived: {$ne: true}});
+      res.send(allOpenJobs);
+    } catch (error) {
+      throw error;
+    }
+    // https://www.mongodb.com/docs/manual/reference/operator/query/ne/
+  });
+
 //get jobs - all (via Model and Controller)
 // app.get("/get-all-jobs", findAll);
 

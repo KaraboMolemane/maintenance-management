@@ -57,7 +57,7 @@ function App() {
 
   useEffect(() => {
     //Do the API call
-    fetch("/get-all-jobs")
+    fetch("/get-open-jobs")
       //.then((res) => console.log('res:',res))
       .then((res) => res.json())
       .then(
