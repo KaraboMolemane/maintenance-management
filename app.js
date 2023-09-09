@@ -80,15 +80,15 @@ app.get("/get-all-jobs", async (req, res) => {
 });
 
 app.get("/get-open-jobs", async (req, res) => {
-    // get non-archived jobs
-    try {
-      const allOpenJobs = await JobModel.find({archived: {$ne: true}});
-      res.send(allOpenJobs);
-    } catch (error) {
-      throw error;
-    }
-    // https://www.mongodb.com/docs/manual/reference/operator/query/ne/
-  });
+  // get non-archived jobs
+  try {
+    const allOpenJobs = await JobModel.find({ archived: { $ne: true } });
+    res.send(allOpenJobs);
+  } catch (error) {
+    throw error;
+  }
+  // https://www.mongodb.com/docs/manual/reference/operator/query/ne/
+});
 
 //get jobs - all (via Model and Controller)
 // app.get("/get-all-jobs", findAll);
@@ -101,7 +101,7 @@ app.post("/new-job", function (req, res) {
     location: req.body.location,
     priority: req.body.priority,
     status: req.body.status,
-    archived: false
+    archived: false,
   });
 
   jobModel
@@ -143,22 +143,22 @@ app.put("/edit-job", async (req, res) => {
 });
 
 app.put("/archive-job", async (req, res) => {
-    try {
-      const filter = { _id: req.body.id };
-      const update = {
-        archived: true,
-        updatedAt: Date.now()
-      };
-      const doc = await JobModel.findOneAndUpdate(filter, update, {
-        new: true,
-      });
-      res.send("Updated");
-    } catch (error) {
-      console.log("Something went wrong when updating data.:", error);
-      res.send({ message: "Some error occurred while creating the job.", error });
-    }
-    // https://mongoosejs.com/docs/tutorials/findoneandupdate.html
-  });
+  try {
+    const filter = { _id: req.body.id };
+    const update = {
+      archived: true,
+      updatedAt: Date.now(),
+    };
+    const doc = await JobModel.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    res.send("Updated");
+  } catch (error) {
+    console.log("Something went wrong when updating data.:", error);
+    res.send({ message: "Some error occurred while creating the job.", error });
+  }
+  // https://mongoosejs.com/docs/tutorials/findoneandupdate.html
+});
 
 app.listen(8080, function () {
   console.log("Example app listening on port 8080!");

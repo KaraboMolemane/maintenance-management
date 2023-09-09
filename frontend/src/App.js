@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "devextreme/dist/css/dx.light.css";
 import DataGrid, {
@@ -68,7 +68,6 @@ function App() {
   useEffect(() => {
     //Do the API call
     fetch("/get-open-jobs")
-      //.then((res) => console.log('res:',res))
       .then((res) => res.json())
       .then(
         (result) => {
@@ -84,12 +83,9 @@ function App() {
       );
   }, []);
 
-  const onSaving = useCallback((e) => {
-    console.log("On saving", e);
-
+  const onSaving = (e) => {
     if (e.changes[0].type === "remove") {
-      // Archive job
-      // DO NOT delete
+      // Archive a specific job (so that it is no longer shown on the list, but isn't totally deleted)
       const job = { id: e.changes[0].key };
       fetch("/archive-job", {
         method: "PUT",
@@ -103,8 +99,7 @@ function App() {
     } else {
       // Edit or add new job
       const jobs = e.changes;
-      // console.log('jobs:', jobs)
-  
+
       if (jobs.length !== 0) {
         jobs.forEach((element, index) => {
           const job = {
@@ -116,7 +111,7 @@ function App() {
 
           if (e.changes[0].type === "update") {
             // EDIT existing job
-            job.id = element.key? element.key : editingModeID.current;
+            job.id = element.key ? element.key : editingModeID.current;
 
             fetch("/edit-job", {
               method: "PUT",
@@ -141,24 +136,15 @@ function App() {
         });
         window.location.href = "/";
       }
-
     }
-  }, []);
-
-  const editJob = useCallback((e) => {
-    console.log("editJob", e);
-    editingModeID.current = e.data._id;
-
-  }, []);
+  };
 
   function loadModalData() {
     fetch("/get-all-jobs")
-      //.then((res) => console.log('res:',res))
       .then((res) => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
-          console.log("All Jobs:", result);
           setAllJobs(result);
         },
         (error) => {
@@ -179,7 +165,6 @@ function App() {
           keyExpr="_id"
           showBorders={true}
           onSaving={onSaving}
-          onEditingStart={editJob}
         >
           <Paging defaultPageSize={10} />
           <HeaderFilter visible={true}>
@@ -215,7 +200,10 @@ function App() {
         </DataGrid>
       </div>
       {/* modal for buld edit*/}
-      <div className="d-inline-flex gap-2 mb-5 mt-5" style={{marginLeft:'45%'}}>
+      <div
+        className="d-inline-flex gap-2 mb-5 mt-5"
+        style={{ marginLeft: "45%" }}
+      >
         <button
           type="button"
           className="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill"
@@ -253,9 +241,8 @@ function App() {
                   keyExpr="_id"
                   showBorders={true}
                   onSaving={onSaving}
-                  onEditingStart={editJob}
                 >
-                  <Paging defaultPageSize={10}/>
+                  <Paging defaultPageSize={10} />
                   <Editing
                     mode="batch"
                     allowUpdating={true}
