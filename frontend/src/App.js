@@ -10,15 +10,10 @@ import DataGrid, {
   Form,
   HeaderFilter,
   Search,
-  CheckBox,
-  SelectBox,
 } from "devextreme-react/data-grid";
 import "devextreme-react/text-area";
 import { Item } from "devextreme-react/form";
-import { employees, states } from "./data.js";
 import Header from "./components/Header";
-
-const notesEditorOptions = { height: 100 };
 
 function App() {
   //declare state(s)
@@ -26,11 +21,6 @@ function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
   const [allJobs, setAllJobs] = useState([]);
-
-  const [state, setState] = useState({
-    selectTextOnEditStart: true,
-    startEditAction: "click",
-  });
 
   const editingModeID = useRef(0);
 
@@ -75,13 +65,6 @@ function App() {
     },
   ];
 
-  const startEditActions = ["click", "dblClick"];
-  const actionLabel = { "aria-label": "Action" };
-
-  const onSelectTextOnEditStartChanged = function () {
-    // TO DO
-  };
-
   useEffect(() => {
     //Do the API call
     fetch("/get-open-jobs")
@@ -104,7 +87,6 @@ function App() {
   const onSaving = useCallback((e) => {
     console.log("On saving", e);
 
-
     if (e.changes[0].type === "remove") {
       // Archive job
       // DO NOT delete
@@ -120,60 +102,53 @@ function App() {
       });
     } else {
       // Edit or add new job
-      const job = {
-        description: e.changes[0].data.description,
-        location: e.changes[0].data.location,
-        priority: e.changes[0].data.priority,
-        status: e.changes[0].data.status,
-      };
+      const jobs = e.changes;
+      // console.log('jobs:', jobs)
+  
+      if (jobs.length !== 0) {
+        jobs.forEach((element, index) => {
+          const job = {
+            description: element.data.description,
+            location: element.data.location,
+            priority: element.data.priority,
+            status: element.data.status,
+          };
 
-      if (e.changes[0].type === "update") {
-        // EDIT existing job
-        job.id = editingModeID.current;
+          if (e.changes[0].type === "update") {
+            // EDIT existing job
+            job.id = element.key? element.key : editingModeID.current;
 
-        fetch("/edit-job", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(job),
-        }).then(() => {
-          console.log("Frontend - job edited");
-          editingModeID.current = 0; //Reset editingMode,
-          window.location.href = "/";
+            fetch("/edit-job", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(job),
+            }).then(() => {
+              console.log("Frontend - job edited");
+              editingModeID.current = 0; //Reset editingMode,
+              // window.location.href = "/";
+            });
+          } else {
+            // ADD new job
+            fetch("/new-job", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(job),
+            }).then(() => {
+              console.log("Frontend - new job added");
+              // window.location.href = "/";
+            });
+          }
         });
-      } else {
-        // ADD new job
-        fetch("/new-job", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(job),
-        }).then(() => {
-          console.log("Frontend - new job added");
-          window.location.href = "/";
-        });
+        window.location.href = "/";
       }
+
     }
-  }, []);
-
-  const afterSaving = (e) => {
-    console.log("After saving", e);
-    e.cancel = true;
-    //e.promise = saveChange(dispatch, e.changes[0]);
-    //Reset editingMode,
-    //Route to homepage to refresh table
-  };
-
-  const addNewJob = useCallback((e) => {
-    console.log("new job", e);
-    e.cancel = true;
-    //e.promise = saveChange(dispatch, e.changes[0]);
   }, []);
 
   const editJob = useCallback((e) => {
     console.log("editJob", e);
     editingModeID.current = e.data._id;
-    //get id of job being edited
-    // e.cancel = true;
-    //e.promise = saveChange(dispatch, e.changes[0]);
+
   }, []);
 
   function loadModalData() {
@@ -204,11 +179,9 @@ function App() {
           keyExpr="_id"
           showBorders={true}
           onSaving={onSaving}
-          onSaved={afterSaving}
-          onInitNewRow={addNewJob}
           onEditingStart={editJob}
         >
-          <Paging enabled={false} />
+          <Paging defaultPageSize={10} />
           <HeaderFilter visible={true}>
             <Search enabled={true} />
           </HeaderFilter>
@@ -242,7 +215,7 @@ function App() {
         </DataGrid>
       </div>
       {/* modal for buld edit*/}
-      <div className="d-inline-flex gap-2 mb-5 mt-5">
+      <div className="d-inline-flex gap-2 mb-5 mt-5" style={{marginLeft:'45%'}}>
         <button
           type="button"
           className="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill"
@@ -280,11 +253,9 @@ function App() {
                   keyExpr="_id"
                   showBorders={true}
                   onSaving={onSaving}
-                  onSaved={afterSaving}
-                  onInitNewRow={addNewJob}
                   onEditingStart={editJob}
                 >
-                  <Paging enabled={false} />
+                  <Paging defaultPageSize={10}/>
                   <Editing
                     mode="batch"
                     allowUpdating={true}
