@@ -90,9 +90,7 @@ app.post("/new-job", function (req, res) {
     location: req.body.location,
     priority: req.body.priority,
     status: req.body.status,
-    archived: false,
-    createdAt: req.body.createdAt,
-    updatedAt: req.body.updatedAt,
+    archived: false
   });
 
   jobModel
@@ -111,29 +109,45 @@ app.post("/new-job", function (req, res) {
 });
 
 // Edit existing job
-app.post("/edit-job", function (req, res) {
-
-    let filter = { _id: req.body.id };
-  JobModel.findOneAndUpdate(
-    filter,
-    {    
-        description: req.body.description,
-        location: req.body.location,
-        priority: req.body.priority,
-        status: req.body.status,
-        archived: false,
-        createdAt: req.body.createdAt,
-        updatedAt: req.body.updatedAt
-     },
-    { new: true },
-    function (err, doc) {
-      if (err) {
-        console.log("Something went wrong when updating data.");
-      }
-      res.send("Updated");
-    }
-  );
+app.put("/edit-job", async (req, res) => {
+  try {
+    const filter = { _id: req.body.id };
+    const update = {
+      description: req.body.description,
+      location: req.body.location,
+      priority: req.body.priority,
+      status: req.body.status,
+      archived: false,
+      updatedAt: Date.now(),
+    };
+    const doc = await JobModel.findOneAndUpdate(filter, update, {
+      new: true,
+    });
+    res.send("Updated");
+  } catch (error) {
+    console.log("Something went wrong when updating data.:", error);
+    res.send({ message: "Some error occurred while creating the job.", error });
+  }
+  // https://mongoosejs.com/docs/tutorials/findoneandupdate.html
 });
+
+app.put("/archive-job", async (req, res) => {
+    try {
+      const filter = { _id: req.body.id };
+      const update = {
+        archived: true,
+        updatedAt: Date.now()
+      };
+      const doc = await JobModel.findOneAndUpdate(filter, update, {
+        new: true,
+      });
+      res.send("Updated");
+    } catch (error) {
+      console.log("Something went wrong when updating data.:", error);
+      res.send({ message: "Some error occurred while creating the job.", error });
+    }
+    // https://mongoosejs.com/docs/tutorials/findoneandupdate.html
+  });
 
 app.listen(8080, function () {
   console.log("Example app listening on port 8080!");

@@ -23,7 +23,7 @@ function App() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
-  const editingModeId = useRef(0);
+  const editingModeID = useRef(0);
 
   const status = [
     {
@@ -56,7 +56,6 @@ function App() {
   ];
 
   useEffect(() => {
-    //loadJobs(dispatch);
     //Do the API call
     fetch("/get-all-jobs")
       //.then((res) => console.log('res:',res))
@@ -76,53 +75,59 @@ function App() {
   }, []);
 
   const onSaving = useCallback((e) => {
-
     console.log("On saving", e);
-  
-    if (editingModeId.current !== 0) {
-      // EDIT existing job
-      const job = {
-        id: editingModeId.current,
-        id2: e.changes[0].data._id,
-        description: e.changes[0].data.description,
-        location: e.changes[0].data.location,
-        priority: e.changes[0].data.priority,
-        status: e.changes[0].data.status,
-        createdAt: e.changes[0].data.createdAt,
-        updatedAt: e.changes[0].data.updatedAt,
-      };
 
-      console.log('edited car', job)
-      
-      console.log('saving edited car ....');
-    } else {
-      // ADD new job 
-      console.log('saving new car ....');
-
-      const job = {
-        description: e.changes[0].data.description,
-        location: e.changes[0].data.location,
-        priority: e.changes[0].data.priority,
-        status: e.changes[0].data.status,
-        createdAt: e.changes[0].data.createdAt,
-        updatedAt: e.changes[0].data.updatedAt,
-      };
-
-      console.log('job', job) 
-
-      fetch("/new-job", {
-        method: "POST",
+    if(e.changes[0].type === "remove"){
+      // Archive job 
+      // DO NOT delete 
+      const job = {id: e.changes[0].key }
+      fetch("/archive-job", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(job),
       }).then(() => {
-        console.log('React - new job added');
+        console.log("Frontend - job archived");
+        editingModeID.current = 0; //Reset editingMode,
+        window.location.href = "/";
       });
+
     }
+    else{
+      // Edit or add new job 
+      const job = {
+        description: e.changes[0].data.description,
+        location: e.changes[0].data.location,
+        priority: e.changes[0].data.priority,
+        status: e.changes[0].data.status
+      };
+  
+      if (e.changes[0].type === "update") {
+        // EDIT existing job
+        job.id = editingModeID.current;
+  
+        fetch("/edit-job", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(job),
+        }).then(() => {
+          console.log("Frontend - job edited");
+          editingModeID.current = 0; //Reset editingMode,
+          window.location.href = "/";
+        });
+      } else {
+        // ADD new job
+        fetch("/new-job", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(job),
+        }).then(() => {
+          console.log("Frontend - new job added");
+          window.location.href = "/";
+        });
+      }
 
-    //Reset editingMode,
-    //Route to homepage to refresh table
+    }
   }, []);
-
 
   const afterSaving = (e) => {
     console.log("After saving", e);
@@ -140,11 +145,12 @@ function App() {
 
   const editJob = useCallback((e) => {
     console.log("editJob", e);
-    //get id of job being edited 
-    editingModeId.current = e.key;
+    editingModeID.current = e.data._id;
+    //get id of job being edited
     // e.cancel = true;
     //e.promise = saveChange(dispatch, e.changes[0]);
   }, []);
+
 
   return (
     <>
@@ -170,25 +176,23 @@ function App() {
             allowAdding={true}
             allowDeleting={true}
           >
-            <Popup title="Job Info" showTitle={true} width={700} height={325} />
+            <Popup title="Job Info" showTitle={true} width={700} height={255} />
             <Form>
               <Item itemType="group" colCount={2} colSpan={2}>
                 <Item dataField="description" />
                 <Item dataField="location" />
                 <Item dataField="priority" />
                 <Item dataField="status" />
-                <Item dataField="createdAt" />
-                <Item dataField="updatedAt" />
               </Item>
             </Form>
           </Editing>
           <Column dataField="_id" caption="Id" width={70} />
           <Column dataField="description" width={170} />
           <Column dataField="location" />
-          <Column dataField="status" caption="Status" >
+          <Column dataField="status" caption="Status">
             <Lookup dataSource={status} displayExpr="Name" valueExpr="ID" />
           </Column>
-          <Column dataField="priority" caption="Priority" >
+          <Column dataField="priority" caption="Priority">
             <Lookup dataSource={priority} displayExpr="Name" valueExpr="ID" />
           </Column>
           <Column dataField="createdAt" dataType="date" />
