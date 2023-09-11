@@ -8,7 +8,7 @@ A React app (frontend) that uses Express and Mongoose (backend) to manage jobs i
 - Run the backend typing `npm start`. The project will automatically reload everytime changes are made. 
 - The front end will run on http://localhost:8080/
 - If you do not have MongoDB account already, create a new one [here](https://www.mongodb.com/)
-- Inside MongoDB, create a collection called 'jobs' and insert the sample data below to get started
+- Inside MongoDB, create a collection/'table' called 'jobs' and insert the sample data below to get started
 
 `db.jobs.insertMany([{description: 'Geyser Burst', location: 'San Ridge Village', priority: 'High', status: 'submitted', archived: false, createdAt: new Date(), updatedAt: new Date()}, {description: 'Blown light', location: 'Erand Gardens', priority: 'Low', status: 'submitted', archived: false, createdAt: new Date(), updatedAt: new Date()}, {description: 'Maw the lawn', location: 'Erand Gardens', priority: 'Medium', status: 'submitted', archived: true, createdAt: new Date(), updatedAt: new Date()}, {description: 'Repainting', location: 'Erand Court', priority: 'Low', status: 'submitted', archived: false, createdAt: new Date(), updatedAt: new Date()}]);`
 
