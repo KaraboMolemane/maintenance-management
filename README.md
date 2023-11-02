@@ -6,7 +6,7 @@ A React app (frontend) that uses Express and Mongoose (backend) to manage jobs i
 - Clone the repo to you local machine
 - Open the project and in your command line interface, navigate to this folder and type `npm install`.
 - Run the backend typing `npm start`. The project will automatically reload everytime changes are made. 
-- The front end will run on http://localhost:8080/
+- The backend will run on http://localhost:8080/
 - If you do not have MongoDB account already, create a new one [here](https://www.mongodb.com/)
 - Inside MongoDB, create a collection/'table' called 'jobs' and insert the sample data below to get started
 
